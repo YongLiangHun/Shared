@@ -1,0 +1,60 @@
+<project name="StockOptionVesting" default="dist" basedir=".">
+
+    <property name="src" value="./src/main"/>
+    <property name="test" value="./src/test"/>
+    <property name="lib" value="./lib"/>
+    <property name="app.name" value="StockOptionVesting"/>
+    <property name="reports" value="reports"/>
+
+    <property name="dist" value="./dist"/>
+    <property name="classes" value="${dist}/classes/"/>
+    <property name="test-classes" value="${dist}/test-classes/"/>
+
+    <path id="classpath">
+        <pathelement location="lib/testng-6.8.21.jar"/>
+        <pathelement location="${classes}"/>
+        <fileset dir="${lib}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="clean" description="Delete old work and dist directories">
+        <delete dir="${dist}"/>
+    </target>
+
+    <target name="prepare" depends="clean">
+        <mkdir dir="${classes}"/>
+        <mkdir dir="${test-classes}"/>
+    </target>
+
+    <target name="compile" depends="prepare">
+        <javac srcdir="${src}" destdir="${classes}" deprecation="on" debug="on" includeAntRuntime="false">
+            <classpath refid="classpath"/>
+        </javac>
+        <javac srcdir="${test}" destdir="${test-classes}" deprecation="on" debug="on" includeAntRuntime="false">
+            <classpath refid="classpath"/>
+        </javac>
+    </target>
+
+    <taskdef name="testng" classpathref="classpath" classname="org.testng.TestNGAntTask" />
+
+    <target name="test" depends="compile">
+        <testng classpathref="classpath">
+            <classfileset dir="${test-classes}" includes="solium/*.class"/>
+            <classpath location="${test-classes}"/>
+
+        </testng>
+    </target>
+
+    <target name="dist" depends="compile, test">
+        <jar jarfile="${dist}/${app.name}.jar">
+            <fileset dir="${classes}"  />
+            <fileset dir="${test-classes}"  />
+            <fileset dir="${src}/resources"/>
+            <manifest>
+                <attribute name="Main-Class" value="solium.App"/>
+            </manifest>
+        </jar>
+    </target>
+
+</project>
